@@ -86,34 +86,32 @@ if file:
     st.write("📄 Datos del PDF:")
     st.dataframe(df)
 
-    # ---- CALCULAR PENDIENTE REAL ----
+    # ---- CALCULAR PENDIENTE REAL POR ENTITY + CHARACTERISTIC ----
     df['Datetime'] = pd.to_datetime(df['Fecha'] + ' ' + df['Hora'], errors='coerce')
-    df = df.sort_values(['Entity', 'Datetime']).reset_index(drop=True)
-
+    df = df.sort_values(['Entity', 'Characteristic', 'Datetime']).reset_index(drop=True)
+    
     pendiente_real = []
-
-    for ent, group in df.groupby('Entity'):
+    
+    # Agrupamos por Entity **y** por eje (Characteristic)
+    for (ent, eje), group in df.groupby(['Entity', 'Characteristic']):
         group = group.sort_values('Datetime')
-
+    
         old_inicial = group.iloc[0]['Old']
         new_final = group.iloc[-1]['New']
         fecha_final = group.iloc[-1]['Fecha']
         hora_final = group.iloc[-1]['Hora']
         diferencia = abs(old_inicial - new_final)
-
-        # ⭐ AGREGAR CHARACTERISTIC (agarramos la última del grupo)
-        characteristic_final = group.iloc[-1]['Characteristic']
-
+    
         pendiente_real.append({
             'Entity': ent,
-            'Characteristic': characteristic_final,   # ← NUEVA COLUMNA
+            'Characteristic': eje,
             'Fecha_final': fecha_final,
             'Hora_final': hora_final,
             'Old_inicial': old_inicial,
             'New_final': new_final,
             'Diferencia_pendiente': diferencia
         })
-
+    
     df_pendiente_real = pd.DataFrame(pendiente_real)
 
     st.subheader("❗ Offsets Pendientes de Regresar")
@@ -131,3 +129,4 @@ if file:
         file_name="offsets_pendientes.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
