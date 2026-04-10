@@ -4,6 +4,7 @@ import re
 import pandas as pd
 from io import BytesIO
 
+
 st.title("Offsets Pendientes🔔⚠️")
 
 file = st.file_uploader("Sube PDF Offset 📁 ⬆️", type=["pdf"])
@@ -129,4 +130,3 @@ if file:
         file_name="offsets_pendientes.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
